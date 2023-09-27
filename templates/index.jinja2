@@ -1,0 +1,175 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Axon Python TicTacToe Demo</title>
+    <style type="text/css" media="screen">
+        body {
+            font-family: Verdana;
+        }
+
+        .col {
+            float: left;
+        }
+
+        .cell {
+            margin-top: 10px;
+            margin-bottom: 35px;
+            margin-left: 18px;
+            margin-right: 18px;
+            width: 130px;
+            height: 130px;
+            border: 0px solid #999;
+        }
+
+        #board {
+            padding: 5px;
+            width: 516px;
+            height: 506px;
+            background-image: url(images/board.png);
+            background-repeat: no-repeat;
+        }
+
+        #message {
+            border: 1px solid #FEE;
+            background-color: #FFE9E9;
+            clear: both;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #controls {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #DDD;
+            border-radius: 10px;
+        }
+
+        #page {
+            margin: 20px auto;
+            width: 520px;
+            /*border: 1px solid #999;*/
+        }
+
+        #header {
+            color: #444;
+            text-align: center;
+            background-color: #DDD;
+        }
+
+        #spinner {
+            float: right;
+            display: none;
+            background: url(/images/loader.gif);
+            background-size: contain;
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+    <script type="text/javascript">
+        var board = Array(9).fill(0)
+        function refreshBoard(recs) {
+            var symbols = ['images/o.png', 'images/blank.png', 'images/x.png'];
+            board.forEach(function (c, i) {
+                var cell = document.getElementById('c' + i);
+                //cell.innerHTML = symbols[c + 1];
+                cell.style.backgroundImage = 'url(' + symbols[c + 1] + ')';
+                if (recs[i] > 0) {
+                    cell.style.backgroundImage = 'radial-gradient(circle, green ' + Math.floor(80 * recs[i]) + '%, white, white)';
+                } else if (recs[i] < 0) {
+                    cell.style.backgroundImage = 'radial-gradient(circle, red ' + Math.floor(80 * recs[i]) + '%, white, white)';
+                } else {
+                    cell.style.backgroundColor = '#FFF'
+                }
+            });
+        }
+
+        async function postJSON(path, data, callback) {
+            try {
+                const response = await fetch("http://localhost:9999" + path, {
+                    method: "POST", // or 'PUT'
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                console.log("Success:", result);
+                callback(result)
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function play(action) {
+            postJSON("/play", { id: "{{ id }}", action: action }, (result) => {
+                sum = board.reduce((acc, e) => acc + Math.abs(e), 0);
+                board[result.action] = sum % 2 == 0 ? 1 : -1;
+                postJSON("/recommend", { state: board }, (recs) => {
+                    console.log(recs)
+                    refreshBoard(recs)
+                })
+            })
+        }
+
+        function simulate() {
+            const spinner = document.getElementById("spinner");
+            spinner.style.display = "block";
+            steps = document.getElementById("steps").value
+            postJSON("/simulate", { "count": parseInt(steps) }, (result) => {
+                spinner.style.display = "none";
+                console.log(result)
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+
+    <div id="page">
+
+        <h1 id="header">Tic Tac Toe</h1>
+        <!-- <form method="post" name="board" action="/play"> -->
+        <div id="board">
+            <div class="col">
+                <div id="c0" class="cell" onclick="play(0)"></div>
+                <div id="c3" class="cell" onclick="play(3)"></div>
+                <div id="c6" class="cell" onclick="play(6)"></div>
+            </div>
+            <div class="col">
+                <div id="c1" class="cell" onclick="play(1)"></div>
+                <div id="c4" class="cell" onclick="play(4)"></div>
+                <div id="c7" class="cell" onclick="play(7)"></div>
+            </div>
+            <div class="col">
+                <div id="c2" class="cell" onclick="play(2)"></div>
+                <div id="c5" class="cell" onclick="play(5)"></div>
+                <div id="c8" class="cell" onclick="play(8)"></div>
+            </div>
+        </div>
+        <!-- </form> -->
+
+        <div style="clear:both"></div>
+
+        <div id="controls">
+            <!-- <button onclick="reset()">Reset</button> -->
+            <select id="steps">
+                <option value="10">10</option>
+                <option value="100">100</option>
+                <option value="1000">1000</option>
+                <option value="10000">10000</option>
+            </select>
+            <button onclick="simulate()">Simulate</button>
+            <div id="spinner"></div>
+            <button onclick="location.reload()">New Game</button>
+        </div>
+
+        <!-- <p id="message"></p> -->
+
+    </div>
+
+</body>
+
+</html>
