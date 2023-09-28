@@ -1,10 +1,8 @@
+import os
 import uuid
 import socket
-import asyncio
 from pprint import pprint
 from aiohttp import web
-import nest_asyncio
-from typing import TypeVar, Callable
 
 from axon.adapter.handlers import (
     event_message_handler,
@@ -12,26 +10,18 @@ from axon.adapter.handlers import (
     query_message_handler,
 )
 
-from axon.application.repositories import ViewStateRepository
-from axon.application.views import MaterializedView
 from axon.application.aggregates import EventSourcingLockingAggregate
-from axon.domain.decider import IDecider
 
-# from giftcard.adapter.giftcard_state_repository import GiftCardViewStateRepository
 from adapter.game_event_repository import GameEventRepository
 from application.trainer import GameTrainer
 from domain.decider import TicTacToeDecider
 from domain.game.state import TicTacToeState as GameState
 from domain.game.simulation import simulate
 
-# from giftcard.domain.giftcard_view import GiftCardSummaryView, GiftCardSummary
 from payloads import *
 
 from axon.synapse_client import AxonSynapseClient
 from axon.adapter.handlers import CommandMessage
-
-# class GiftCardSummaryViewHandler(MaterializedView[GiftCardSummary, GiftCardEvent]):
-#     pass
 
 
 class GameAggregate(
@@ -118,7 +108,8 @@ def routes(client: AxonSynapseClient):
 
 
 async def register_handlers(client: AxonSynapseClient):
-    callback_url = f"http://{socket.gethostname()}:8888"
+    hostname = os.getenv("CALLBACK_HOST", socket.gethostname())
+    callback_url = f"http://{hostname}:8888"
     # callback_url = f"http://localhost:8888"
     uuids = "0274567e-1742-4446-b649"
     kwargs = dict(

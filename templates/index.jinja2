@@ -54,7 +54,8 @@
         #header {
             color: #444;
             text-align: center;
-            background-color: #DDD;
+            /*background-color: #DDD;*/
+            border-radius: 10px;
         }
 
         #spinner {
@@ -86,7 +87,7 @@
 
         async function postJSON(path, data, callback) {
             try {
-                const response = await fetch("http://localhost:9999" + path, {
+                const response = await fetch("http://localhost:8881" + path, {
                     method: "POST", // or 'PUT'
                     headers: {
                         "Content-Type": "application/json",
@@ -159,7 +160,7 @@
                 <option value="10">10</option>
                 <option value="100">100</option>
                 <option value="1000">1000</option>
-                <option value="10000">10000</option>
+                <!-- <option value="10000">10000</option> -->
             </select>
             <button onclick="simulate()">Simulate</button>
             <div id="spinner"></div>
