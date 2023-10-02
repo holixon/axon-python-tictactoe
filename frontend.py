@@ -92,7 +92,7 @@ async def main():
     app.router.add_post("/play", move)
     app.router.add_post("/recommend", recommend)
     app.router.add_post("/simulate", simulate_plays)
-    app.router.add_static("/images", "templates/images")
+    app.router.add_static("/assets", "templates/assets")
     app.cleanup_ctx.append(on_cleanup_ctx)
     return app
 
