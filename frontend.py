@@ -6,9 +6,7 @@ import aiohttp_jinja2
 import jinja2
 from axon.adapter.payloads import payload_from_object
 from axon.synapse_client import AxonSynapseClient
-from domain.game.state import TicTacToeState as GameState
-from domain.game.players import RandomPlayer
-from domain.game.simulation import play, simulate
+
 from payloads import *
 
 
@@ -50,50 +48,41 @@ async def index(request):
 
 
 async def move(request):
-    dispatch = request.app["CommandGateway"].dispatch
-    payload = await request.json()
-    print(payload)
-    command = PlayMoveCommand(**payload)
-    text = await dispatch(command)
-    print("TEXT", text)
-    result = json.loads(text)
-    pprint(result)
-    response = {
+    command = PlayMoveCommand(**(await request.json()))
+    result = json.loads(await request.app["CommandGateway"].dispatch(command))
+    payload = {
         "action": command.action,
         "gameover": len(result) > 1,
     }
-    if response["gameover"]:
-        response["winner"] = result[1][0]["winner"]
-    return web.json_response(response)
+    if payload["gameover"]:
+        payload["winner"] = result[1][0]["winner"]
+    return web.json_response(payload)
 
 
 async def recommend(request):
-    query = request.app["QueryGateway"].query
-    state = await request.json()
-    pprint(state)
-    result = await query(RecommendedActionsQuery(**state))
-    pprint(result)
-    return web.json_response(result)
+    return web.json_response(
+        await request.app["QueryGateway"].query(
+            RecommendedActionsQuery(**(await request.json()))
+        )
+    )
 
 
 async def simulate_plays(request):
-    dispatch = request.app["CommandGateway"].dispatch
-    payload = await request.json()
-    pprint(payload)
-    response = await dispatch(SimulateGameCommand(count=payload["count"]))
-    return web.json_response(response)
+    return web.json_response(
+        await request.app["CommandGateway"].dispatch(
+            SimulateGameCommand(**(await request.json()))
+        )
+    )
 
 
-async def on_startup(app):
-    print("on_startup")
-    client = AxonSynapseClient()
-    app["CommandGateway"] = GameCommandGateway(client)
-    app["QueryGateway"] = GameQueryGateway(client)
-    app["Client"] = client
-
-
-async def on_cleanup(app):
-    print("on_cleanup")
+async def on_cleanup_ctx(app):
+    print("on_cleanup_ctx (SETUP)")
+    async with AxonSynapseClient() as client:
+        app["CommandGateway"] = GameCommandGateway(client)
+        app["QueryGateway"] = GameQueryGateway(client)
+        app["Client"] = client
+        yield
+    print("on_cleanup_ctx (CLEANUP)")
 
 
 async def main():
@@ -104,8 +93,7 @@ async def main():
     app.router.add_post("/recommend", recommend)
     app.router.add_post("/simulate", simulate_plays)
     app.router.add_static("/images", "templates/images")
-    app.on_startup.append(on_startup)
-    app.on_cleanup.append(on_cleanup)
+    app.cleanup_ctx.append(on_cleanup_ctx)
     return app
 
 

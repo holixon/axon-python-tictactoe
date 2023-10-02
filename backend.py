@@ -21,7 +21,6 @@ from domain.game.simulation import simulate
 from payloads import *
 
 from axon.synapse_client import AxonSynapseClient
-from axon.adapter.handlers import CommandMessage
 
 
 class GameAggregate(
@@ -55,7 +54,6 @@ class RecommendationQueryHandler:
                 state = GameState(query.state)
                 values = {a: self.Q.get(str(state.move(a))) for a in state.actions()}
                 result = [values.get(a) or 0 for a in range(0, 9)]
-                # pprint(self.Q)
                 pprint(result)
                 result = self.scale(result)
                 pprint(result)
@@ -65,7 +63,6 @@ class RecommendationQueryHandler:
         return None
 
     def scale(self, values):
-        # minx = min(*values)
         total = sum(abs(e) for e in values)
         if total == 0:
             return values
@@ -73,7 +70,6 @@ class RecommendationQueryHandler:
 
 
 def routes(client: AxonSynapseClient):
-    # state_repository = GiftCardViewStateRepository()
     event_repository = GameEventRepository(client)
     decider = TicTacToeDecider()
     aggregate = GameAggregate(
@@ -103,8 +99,6 @@ def routes(client: AxonSynapseClient):
             ),
         ),
     ]
-
-    # web.run_app(app, port=port)
 
 
 async def register_handlers(client: AxonSynapseClient):
@@ -151,7 +145,6 @@ async def register_handlers(client: AxonSynapseClient):
         callback_endpoint=f"{callback_url}/queries",
         names=types(
             RecommendedActionsQuery,
-            # FetchCardSummariesQuery,
         ),
         **kwargs,
     )
