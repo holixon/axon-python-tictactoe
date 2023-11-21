@@ -11,7 +11,7 @@ from axon.adapter.handlers import (
 )
 
 from axon.application.aggregates import EventSourcingLockingAggregate
-from axon.adapter.payloads import payload_type_for_class
+from axon.adapter.payloads import payloadclass
 from adapter.game_event_repository import GameEventRepository
 from application.trainer import GameTrainer
 from domain.decider import TicTacToeDecider
@@ -110,7 +110,7 @@ async def register_handlers(client: AxonSynapseClient):
         client_id="python-ttt-7d78946494-p8ttt",
         component_name="TicTacToe",
     )
-    types = lambda *l: [payload_type_for_class(e) for e in l]
+    types = lambda *l: [payloadclass.type_name(e) for e in l]
 
     response = await client.register_event_handler(
         handler_id=f"events-{uuids}",

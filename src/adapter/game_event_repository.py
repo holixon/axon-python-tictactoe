@@ -2,11 +2,7 @@ from typing import Any, Tuple
 from axon.synapse.client import AxonSynapseClient
 from axon.application.repositories import EventLockingRepository
 
-from axon.adapter.payloads import (
-    object_from_payload,
-    payload_from_object,
-    payload_type_for_class,
-)
+from axon.adapter.payloads import payloadclass
 
 from payloads import GameEvent, GameCommand
 
@@ -24,7 +20,7 @@ class GameEventRepository(EventLockingRepository[GameCommand, GameEvent, int]):
         response = await self.client.fetch_aggregate_events(aggregate_id)
         events = [
             (
-                object_from_payload(r.payloadType, r.payload),
+                payloadclass.to_instance(r.payloadType, r.payload),
                 r.sequenceNumber,
             )
             for r in response.items
@@ -38,8 +34,8 @@ class GameEventRepository(EventLockingRepository[GameCommand, GameEvent, int]):
         await self.client.append_event(
             aggregate_id=event.id,  # TODO: externalize
             aggregate_type="TicTacToe",
-            payload_type=payload_type_for_class(type(event)),
-            payload=payload_from_object(event),
+            payload_type=payloadclass.type_name(type(event)),
+            payload=payloadclass.to_payload(event),
             sequence_number=next_version,
         )
         return (event, next_version)
