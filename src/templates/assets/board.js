@@ -10,14 +10,14 @@ function refreshBoard(recs) {
         } else if (recs[i] < 0) {
             cell.style.backgroundImage = 'radial-gradient(circle, red ' + Math.abs(Math.floor(80 * recs[i])) + '%, white, white)';
         } else {
-            cell.style.backgroundColor = '#FFF'
+            cell.style.backgroundColor = '#FFF';
         }
     });
 }
 
 async function postAPI(path, data, callback) {
-    try {
-        const response = await fetch("http://localhost:8881" + path, {
+    try {//http://localhost:8881
+        const response = await fetch("" + path, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+from os.path import dirname, abspath, join
 import uuid
 import json
 from pprint import pprint
@@ -5,7 +6,7 @@ from aiohttp import web
 import aiohttp_jinja2
 import jinja2
 from axon.adapter.payloads import payload_from_object
-from axon.synapse_client import AxonSynapseClient
+from axon.synapse.client import AxonSynapseClient
 
 from payloads import *
 
@@ -87,12 +88,14 @@ async def on_cleanup_ctx(app):
 
 async def main():
     app = web.Application()
-    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("templates"))
+    tpl_dir = join(dirname(abspath(__file__)), "templates")
+    print(f"{tpl_dir=}")
+    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(tpl_dir))
     app.router.add_get("/", index)
     app.router.add_post("/play", move)
     app.router.add_post("/recommend", recommend)
     app.router.add_post("/simulate", simulate_plays)
-    app.router.add_static("/assets", "templates/assets")
+    app.router.add_static("/assets", join(tpl_dir, "assets"))
     app.cleanup_ctx.append(on_cleanup_ctx)
     return app
 

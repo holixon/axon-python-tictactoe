@@ -1,5 +1,5 @@
 from typing import Any, Tuple
-from axon.synapse_client import AxonSynapseClient
+from axon.synapse.client import AxonSynapseClient
 from axon.application.repositories import EventLockingRepository
 
 from axon.adapter.payloads import object_from_payload, payload_from_object

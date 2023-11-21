@@ -79,6 +79,7 @@ select {
     text-align: center;
     /*background-color: #DDD;*/
     border-radius: 10px;
+    font-weight: lighter;
 }
 
 #spinner {

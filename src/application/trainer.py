@@ -28,11 +28,9 @@ class GameTrainer:  # IView[QTable, GameEvent]
                 self.states[event.id] = actions + [action]
             case GameFinishedEvent(winner=winner):
                 actions = self.states[event.id]
-                # print(f"TRAIN: {winner=} {actions}")
                 self.train(actions=actions, winner=winner)
             case _:
-                print(f"Noting found for {event}")
-        # events = await self.repository.fetch_events_by_id(event.id)
+                print(f"Nothing found for {event}")
 
     def train(self, actions, winner):
         state = GameState()
@@ -45,8 +43,6 @@ class GameTrainer:  # IView[QTable, GameEvent]
             if players[i % 2] != winner:
                 reward = -1 * reward
                 decay_reward = -0.5 * decay_reward
-                # decay_reward = 0.0
             TD = reward + self.gamma * decay_reward - qvalue
             qvalue = qvalue + self.alpha * TD
             self.Q[str(state)] = qvalue
-            # pprint(self.Q)

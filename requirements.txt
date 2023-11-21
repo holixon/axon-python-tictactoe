@@ -1,4 +1,3 @@
-aiohttp
+# axon-python-synapse
 aiohttp_jinja2
-termcolor
 click

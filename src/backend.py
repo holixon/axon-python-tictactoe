@@ -20,7 +20,7 @@ from domain.game.simulation import simulate
 
 from payloads import *
 
-from axon.synapse_client import AxonSynapseClient
+from axon.synapse.client import AxonSynapseClient
 
 
 class GameAggregate(
