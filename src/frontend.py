@@ -5,7 +5,7 @@ from pprint import pprint
 from aiohttp import web
 import aiohttp_jinja2
 import jinja2
-from axon.adapter.payloads import payload_from_object
+from axon.adapter.payloads import payload_from_object, payload_type_for_class
 from axon.synapse.client import AxonSynapseClient
 
 from payloads import *
@@ -18,7 +18,7 @@ class MessageGateway:
 
 class GameCommandGateway(MessageGateway):
     async def dispatch(self, command: GameCommand):
-        payload_type = command._payload_type
+        payload_type = payload_type_for_class(type(command))
         client = self.client
         if client is None or payload_type is None:
             raise ValueError(f"Invalid State {client}, {payload_type}")
@@ -32,7 +32,7 @@ class GameCommandGateway(MessageGateway):
 
 class GameQueryGateway(MessageGateway):
     async def query(self, query: GameQuery):
-        payload_type = query._payload_type
+        payload_type = payload_type_for_class(type(query))
         client = self.client
         if client is None or payload_type is None:
             raise ValueError(f"Invalid State {client}, {payload_type}")

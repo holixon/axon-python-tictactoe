@@ -1,0 +1,35 @@
+services:
+  axon-server:
+    image: axoniq/axonserver
+    ports:
+      - "8024:8024"
+      - "8124:8124"
+    entrypoint: ["java", "-Daxoniq.axonserver.standalone=true", "-jar", "./axonserver.jar"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O /dev/null http://localhost:8024 || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+  axon-synapse:
+    image: axoniq/synapse
+    ports:
+      - "8080:8080"
+    depends_on:
+      axon-server:
+        condition: service_healthy
+    entrypoint: ["java", "-Dsynapse.axon-server.server-list=axon-server", "-jar", "./synapse.jar"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O /dev/null http://localhost:8080 || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+  tictactoe:
+    image: macon/tictactoe
+    ports:
+      - "8881:8881"
+    environment:
+      - CALLBACK_HOST=tictactoe
+      - AXON_SYNAPSE_API=http://axon-synapse:8080/v1
+    depends_on:
+      axon-synapse:
+        condition: service_healthy
