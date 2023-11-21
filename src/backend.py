@@ -34,12 +34,11 @@ def simulation_handler(repository: GameEventRepository):
     async def handle(command: SimulateGameCommand, _):
         for history, winner in simulate(GameState(), command.count):
             game_id = str(uuid.uuid4())
-            events = [
+            events: list[GameEvent] = [
                 MovePlayedEvent(id=game_id, action=play.action) for play in history
             ]
             events.append(GameFinishedEvent(id=game_id, winner=winner))
             await repository.save_all(events)
-        # return web.json_response({})
 
     return handle
 
@@ -76,7 +75,7 @@ def routes(client: AxonSynapseClient):
         repository=event_repository,
         decider=decider,
     )
-    Q = {}
+    Q: dict[str, float] = {}
     return [
         web.post(
             "/commands",
@@ -104,8 +103,7 @@ def routes(client: AxonSynapseClient):
 async def register_handlers(client: AxonSynapseClient):
     hostname = os.getenv("CALLBACK_HOST", socket.gethostname())
     callback_url = f"http://{hostname}:8888"
-    # callback_url = f"http://localhost:8888"
-    uuids = "0274567e-1742-4446-b649"
+    uuids = "0274567e-1742-4446-b649"  # TODO
     kwargs = dict(
         client_id="python-ttt-7d78946494-p8ttt",
         component_name="TicTacToe",
