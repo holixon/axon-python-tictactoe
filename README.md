@@ -15,13 +15,19 @@ To install the app, first clone this repository.
 git clone https://github.com/holixon/axon-python-tictactoe.git
 ```
 
-Next install the dependencies. (Assuming in a venv where axon-python-synapse is installed)
+Next install the dependencies. (Assuming in a sourced venv where axon-python-synapse is installed)
 
 ```sh
 cd axon-python-tictactoe
 pip install .
 ```
 
+You need a running synapse server. You can start axon and synapse server with the following command.
+
+
+```sh
+docker compose -f docker/docker-compose-axon.yaml up -d
+```
 
 To start the backend app.
 

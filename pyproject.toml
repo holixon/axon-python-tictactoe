@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]      # PEP 508 specifications.
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "axon-synapse-demo-tictactoe"
+name = "axon-python-tictactoe"
 version = "0.0.1"
 requires-python = ">=3.10"
 description = "Axon Synapse Demo - Tic Tac Toe"
@@ -16,8 +16,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[tool.setuptools.package-data]
+templates = ['*', 'assets/*', 'assets/images/*']
+
 [project.urls]
 Homepage = "https://www.holisticon.de"
-# Documentation = "https://readthedocs.org"
-# Repository = "https://github.com/me/spam.git"
-# Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
